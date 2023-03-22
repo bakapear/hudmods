@@ -29,6 +29,8 @@ If you want to change the scale of the digits, see the individual `resource/spee
 "Resource/HudLayout.res" {
   "speedo_absolute_right" {
     "ypos" "0"
+    "wide" "128"
+    "tall" "32"
     "d4" { "wide" "32" "tall" "32" }
     "d3" { "wide" "32" "tall" "32" }
     "d2" { "wide" "32" "tall" "32" }
