@@ -43,7 +43,8 @@ If you want to change the scale of the digits, see the individual `resource/spee
 ```
 
 <details>
-  <summary>Example of changing center speedo size of digits</summary>
+  <summary>Example of changing center size of digits for center aligned speedo</summary>
+  <br>
   
 ```res
 #base "../resource/speedo_horizontal_center.res"
