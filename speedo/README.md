@@ -27,10 +27,13 @@ The digit textures file is located at `materials/vgui/replay/thumbnails/speedo/d
 If you want to change the scale of the digits, see the individual `resource/speedo_<variation>_<alignment>.res` files for reference and change them either in the file itself or override in your `hudlayout.res` file:
 
 ```res
-#base "../resource/speedo_absolute_center.res"
+#base "../resource/speedo_absolute_right.res"
 "Resource/HudLayout.res" {
   "speedo_absolute_right" {
+    "xpos" "c-64"
     "ypos" "0"
+    "wide" "128"
+    "tall" "32"
     "d4" { "wide" "32" "tall" "32" }
     "d3" { "wide" "32" "tall" "32" }
     "d2" { "wide" "32" "tall" "32" }
@@ -41,6 +44,33 @@ If you want to change the scale of the digits, see the individual `resource/spee
 }
 ```
 
+<details>
+  <summary>Example of changing center size of digits for center aligned speedo</summary>
+  <br>
+  
+```res
+#base "../resource/speedo_horizontal_center.res"
+"Resource/HudLayout.res" {
+  "speedo_horizontal_center" {
+    "xpos" "c-128"
+    "wide" "256"
+    "tall" "64"
+    "d4_4k" { "wide" "64" "tall" "64" }
+    "d3_4k" { "wide" "64" "tall" "64" }
+    "d2_4k" { "wide" "64" "tall" "64" }
+    "d1_4k" { "wide" "64" "tall" "64" }
+    "d3_3k" { "wide" "64" "tall" "64" "xpos" "32" }
+    "d2_3k" { "wide" "64" "tall" "64" }
+    "d1_3k" { "wide" "64" "tall" "64" }
+    "d2_2k" { "wide" "64" "tall" "64" "xpos" "64" }
+    "d1_2k" { "wide" "64" "tall" "64" }
+    "d1_1k" { "wide" "64" "tall" "64" "xpos" "96" }
+  }
+  
+  ...
+}
+```
+</details>
 
 ### Credits
 Waldo, SgtPugs, ILDPRUT
