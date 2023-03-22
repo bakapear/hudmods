@@ -1,5 +1,7 @@
 # TF2 Speedo Hud
 
+![Preview](https://user-images.githubusercontent.com/13366049/226965900-b3a1f2f9-9ffc-4e64-a578-d18f7aab8ea7.png)
+
 ### Installation
 1. Place this folder inside your `tf/custom` folder
 2. Edit your hud's `scripts/hudlayout.res` file and add `#base "../resource/speedo_horizontal_center.res"` at the top
