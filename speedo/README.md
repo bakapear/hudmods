@@ -45,7 +45,7 @@ If you want to change the scale of the digits, see the individual `resource/spee
 ```
 
 <details>
-  <summary>Example of changing center size of digits for center aligned speedo</summary>
+  <summary>Example of changing size of digits for center aligned speedo</summary>
   <br>
   
 ```res
