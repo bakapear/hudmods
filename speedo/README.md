@@ -1,6 +1,8 @@
 # TF2 Speedo Hud
 
 ![Preview](https://user-images.githubusercontent.com/13366049/226966436-ba7b807a-73b9-4ced-ae5f-455a65033e30.png)
+![Preview 2](https://user-images.githubusercontent.com/13366049/227498500-de58cde9-ffbe-422f-acee-e3f18419790d.png)
+
 
 ### Installation
 1. Place this folder inside your `tf/custom` folder
