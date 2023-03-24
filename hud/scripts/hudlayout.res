@@ -5,19 +5,19 @@
 
 "Resource/HudLayout.res" {	
 	"speedo_horizontal_center" {
-		"xpos" "c-24"
-		"ypos" "c70"
-		"wide" "48"
-		"tall" "12"
-		"d4_4k" { "wide" "12" "tall" "12" "xpos" "2" }
-		"d3_4k" { "wide" "12" "tall" "12" "xpos" "-3" }
-		"d2_4k" { "wide" "12" "tall" "12" "xpos" "-3" }
-		"d1_4k" { "wide" "12" "tall" "12" "xpos" "-3" }
-		"d3_3k" { "wide" "12" "tall" "12" "xpos" "8" }
-		"d2_3k" { "wide" "12" "tall" "12" "xpos" "-3" }
-		"d1_3k" { "wide" "12" "tall" "12" "xpos" "-3" }
-		"d2_2k" { "wide" "12" "tall" "12" "xpos" "13" }
-		"d1_2k" { "wide" "12" "tall" "12" "xpos" "-3" }
-		"d1_1k" { "wide" "12" "tall" "12" "xpos" "18" }
+		"xpos" "c-20"
+		"ypos" "c60"
+		"wide" "40"
+		"tall" "10"
+		"d4_4k" { "wide" "10" "tall" "10" "xpos" "4" }
+		"d3_4k" { "wide" "10" "tall" "10" "xpos" "-3" }
+		"d2_4k" { "wide" "10" "tall" "10" "xpos" "-3" }
+		"d1_4k" { "wide" "10" "tall" "10" "xpos" "-3" }
+		"d3_3k" { "wide" "10" "tall" "10" "xpos" "8" }
+		"d2_3k" { "wide" "10" "tall" "10" "xpos" "-3" }
+		"d1_3k" { "wide" "10" "tall" "10" "xpos" "-3" }
+		"d2_2k" { "wide" "10" "tall" "10" "xpos" "11" }
+		"d1_2k" { "wide" "10" "tall" "10" "xpos" "-3" }
+		"d1_1k" { "wide" "10" "tall" "10" "xpos" "15" }
 	}
 }
