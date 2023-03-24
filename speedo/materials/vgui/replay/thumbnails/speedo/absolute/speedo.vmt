@@ -66,6 +66,7 @@
 			srcVar1 $leading srcVar2 $const_zero
 			resultVar $leading_check
 		}
+		Add { srcVar1 $leading_check srcVar2 $const_one resultVar $leading_check }
 		LessOrEqual {
 			lessEqualVar $const_ten greaterVar $frame
 			srcVar1 $leading_check srcVar2 $digit
