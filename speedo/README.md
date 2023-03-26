@@ -1,10 +1,13 @@
 # TF2 Speedo Hud
 
 ![Preview](https://user-images.githubusercontent.com/13366049/226966436-ba7b807a-73b9-4ced-ae5f-455a65033e30.png)
+![Preview 2](https://user-images.githubusercontent.com/13366049/227498500-de58cde9-ffbe-422f-acee-e3f18419790d.png)
+
 
 ### Installation
 1. Place this folder inside your `tf/custom` folder
 2. Edit your hud's `scripts/hudlayout.res` file and add `#base "../resource/speedo_horizontal_center.res"` at the top
+> Or add it inside `resource/ui/hudplayerclass.res` instead, if you want it to show only when player is alive
 
 ### Customization
 There are 3 variations (`horizontal`, `vertical`, `absolute`) each having 3 alignments (`left`, `right`, `center`) to choose from. It is possible to include multiple different variations in the hudlayout file.
