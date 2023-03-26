@@ -1,5 +1,7 @@
 # TF2 Timer Hud
 
+![Preview](https://user-images.githubusercontent.com/13366049/227774214-fd5c9c28-25f5-49c1-a7c6-51023f3146a9.png)
+
 ### Installation
 1. Place this folder inside your `tf/custom` folder
 2. Edit your hud's `scripts/hudlayout.res` file and add `#base "../resource/timer.res"` at the top
