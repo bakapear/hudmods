@@ -1,4 +1,4 @@
-# TF2 Speedo Hud
+# TF2 Heighto Hud
 
 ### Installation
 1. Place this folder inside your `tf/custom` folder
