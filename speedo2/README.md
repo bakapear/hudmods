@@ -56,13 +56,13 @@ proxies {
 	if (timer > 0.0):
 	  speedo = (total_dist + prev_total_dist) / (timer + prev_timer) 
 	
-	if (timer >= 0.01):
+	if (timer >= timer_delay):
 	  prev_timer = timer
 	  prev_total_dist = total_dist
 	  total_dist = 0.0
 	  timer = 0.0
 	
-	if (abs(dz) <= 0.0009):
+	if (abs(dz) <= eps):
 	  speedo = v
 	
 	prev_x = x
