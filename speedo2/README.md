@@ -1,5 +1,8 @@
 # TF2 Speedo Hud (Version 2 ~EXCLUSIVE BETA RELEASE~)
 
+`What this does is that it stores the previous reading, and then the speedo value it displays is a combination of the current reading and the previous reading. 
+So with this the speedo numbers will update quickly, but numbers displayed will be delayed. - Suthrey 2023`
+
 ### Installation
 1. Place this folder inside your `tf/custom` folder
 2. Edit your hud's `scripts/hudlayout.res` file and add `#base "../resource/speedo.res"` at the top
