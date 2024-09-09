@@ -1,4 +1,4 @@
-#base "../mod.vmt"
+#base "mod.vmt"
 
 "UnlitGeneric" {
 	"$digit" 0.0
