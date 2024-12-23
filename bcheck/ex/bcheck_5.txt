@@ -1,0 +1,290 @@
+// Vars
+
+$TICK 0.015
+$GRAVITY -800.0
+$TICKGRAV -12.0
+$MAXVEL 3500.0
+$EPSILON 0.03125
+
+$JVEL 283.0
+
+$OFFSET_CROUCHED 20
+
+$LAND_UNCROUCHED 0
+$LAND_CROUCHED 1
+$LAND_JUMPBUG 2
+
+// bounce parameters
+$BOUNCE_FLOOR_Z 32
+$BOUNCE_LAND 0
+$BOUNCE_TELEHEIGHT 1
+
+// player parameters
+$PLAYER_Z_POS 0.0
+$PLAYER_Z_VEL 0.0
+
+$0 0.0
+$h 0.5
+$1 1.0
+$2 2.0
+$n -1.0
+$tmp1 0.0 $tmp2 0.0 $tmp3 0.0
+$height 0.0 $intervalmin 0.0
+$vel 0.0 $ticktop 0.0 $maxzrel 0.0
+$heightmax 0.0 $heightmin 0.0 $tick0 0.0 
+$z0 0.0 $tickmax 0.0 $tickmin 0.0 
+$b 0.0
+
+$intervalmax 2.0
+
+$sqrt 0.0
+$num 0.0
+
+// Proxies
+
+Equals { srcVar1 $vd resultVar $PLAYER_Z_VEL }
+Equals { srcVar1 $posz resultVar $PLAYER_Z_POS }
+
+Subtract { srcVar1 $PLAYER_Z_POS srcVar2 $BOUNCE_FLOOR_Z resultVar $height }
+
+// if (BOUNCE_LAND === LAND_CROUCHED) height += OFFSET_CROUCHED
+Subtract { srcVar1 $BOUNCE_LAND srcVar2 $LAND_CROUCHED resultVar $tmp1 }
+Abs { srcVar1 $tmp1 resultVar $tmp1 }
+Add { srcVar1 $height srcVar2 $OFFSET_CROUCHED resultVar $tmp2 }
+LessOrEqual { srcVar1 $tmp1 srcVar2 $0 lessEqualVar $tmp2 greaterVar $height resultVar $height }
+
+Add { srcVar1 $height srcVar2 $EPSILON resultVar $height }
+
+// intervalmin = BOUNCE_LAND === LAND_JUMPBUG ? Math.max(0 BOUNCE_TELEHEIGHT - 283 * TICK)  BOUNCE_TELEHEIGHT
+Subtract { srcVar1 $BOUNCE_LAND srcVar2 $LAND_JUMPBUG resultVar $tmp1 }
+Abs { srcVar1 $tmp1 resultVar $tmp1 }
+Multiply { srcVar1 $JVEL srcVar2 $TICK resultVar $tmp2 }
+Subtract { srcVar1 $BOUNCE_TELEHEIGHT srcVar2 $tmp2 resultVar $tmp2 }
+LessOrEqual { srcVar1 $tmp2 srcVar2 $0 lessEqualVar $0 greaterVar $tmp2 resultVar $tmp2 }
+LessOrEqual { srcVar1 $tmp1 srcVar2 $0 lessEqualVar $tmp2 greaterVar $BOUNCE_TELEHEIGHT resultVar $intervalmin }
+
+Equals { srcVar1 $PLAYER_Z_VEL resultVar $vel }
+
+// --- getValidHeight ---
+
+// ticktop = Math.ceil(-vel / TICKGRAV)
+Multiply { srcVar1 $vel srcVar2 $n resultVar $tmp1 }
+Divide { srcVar1 $tmp1 srcVar2 $TICKGRAV resultVar $tmp1 }
+Frac { srcVar1 $tmp1 resultVar $tmp2 }
+Int { srcVar1 $tmp1 resultVar $tmp1 } // Int
+Add { srcVar1 $tmp1 srcVar2 $1 resultVar $tmp3 }
+LessOrEqual { srcVar1 $tmp2 srcVar2 $0 lessEqualVar $tmp1 greaterVar $tmp3 resultVar $ticktop }
+
+// maxzrel = ticktop >= 0 ? (0.5 * TICKGRAV * ticktop * ticktop * TICK + vel * ticktop * TICK)  0.0
+Multiply { srcVar1 $h srcVar2 $TICKGRAV resultVar $tmp1 }
+Multiply { srcVar1 $ticktop srcVar2 $tmp1 resultVar $tmp1 }
+Multiply { srcVar1 $ticktop srcVar2 $tmp1 resultVar $tmp1 }
+Multiply { srcVar1 $TICK srcVar2 $tmp1 resultVar $tmp1 }
+Multiply { srcVar1 $vel srcVar2 $ticktop resultVar $tmp2 }
+Multiply { srcVar1 $TICK srcVar2 $tmp2 resultVar $tmp2 }
+Add { srcVar1 $tmp1 srcVar2 $tmp2 resultVar $tmp2 }
+
+LessOrEqual { srcVar1 $0 srcVar2 $ticktop lessEqualVar $tmp2 greaterVar $0 resultVar $maxzrel }
+
+// heightmax = Math.max(height - intervalmin -maxzrel)
+Multiply { srcVar1 $n srcVar2 $maxzrel resultVar $tmp1 }
+Subtract { srcVar1 $height srcVar2 $intervalmin resultVar $tmp2 }
+LessOrEqual { srcVar1 $tmp2 srcVar2 $tmp1 lessEqualVar $tmp1 greaterVar $tmp2 resultVar $heightmax }
+
+// heightmin = Math.max(height - intervalmax -maxzrel)
+Subtract { srcVar1 $height srcVar2 $intervalmax resultVar $tmp2 }
+LessOrEqual { srcVar1 $tmp2 srcVar2 $tmp1 lessEqualVar $tmp1 greaterVar $tmp2 resultVar $heightmin }
+
+// tick0 = Math.ceil(-(vel + MAXVEL) / TICKGRAV) - 1
+Add { srcVar1 $vel srcVar2 $MAXVEL resultVar $tmp1 }
+Multiply { srcVar1 $tmp1 srcVar2 $n resultVar $tmp1 }
+Divide { srcVar1 $tmp1 srcVar2 $TICKGRAV resultVar $tmp1 }
+Frac { srcVar1 $tmp1 resultVar $tmp2 } // Frac
+Int { srcVar1 $tmp1 resultVar $tmp1 } // Int
+Add { srcVar1 $tmp1 srcVar2 $1 resultVar $tmp3 }
+LessOrEqual { srcVar1 $tmp2 srcVar2 $0 lessEqualVar $tmp1 greaterVar $tmp3 resultVar $tmp1 }
+Subtract { srcVar1 $tmp1 srcVar2 $1 resultVar $tick0 }
+
+// if (tick0 === -1) tick0 = 0
+Subtract { srcVar1 $tick0 srcVar2 $n resultVar $tmp1 }
+Abs { srcVar1 $tmp1 resultVar $tmp1 }
+LessOrEqual { srcVar1 $tmp1 srcVar2 $0 lessEqualVar $0 greaterVar $tick0 resultVar $tick0 }
+
+// --- getLandTickFromStartZVel heightmax ---
+// z0 = 0.5 * TICKGRAV * tick0 * tick0 * TICK + vel * tick0 * TICK + heightmax
+Multiply { srcVar1 $h srcVar2 $TICKGRAV resultVar $tmp1 }
+Multiply { srcVar1 $tick0 srcVar2 $tmp1 resultVar $tmp1 }
+Multiply { srcVar1 $tick0 srcVar2 $tmp1 resultVar $tmp1 }
+Multiply { srcVar1 $TICK srcVar2 $tmp1 resultVar $tmp1 }
+Multiply { srcVar1 $vel srcVar2 $tick0 resultVar $tmp2 }
+Multiply { srcVar1 $TICK srcVar2 $tmp2 resultVar $tmp2 }
+Add { srcVar1 $tmp1 srcVar2 $tmp2 resultVar $tmp1 }
+Add { srcVar1 $tmp1 srcVar2 $heightmax resultVar $z0 }
+
+// tickmax = z0 <= 0.0 ? -(vel + Math.sqrt(vel * vel - 2.0 * GRAVITY * heightmax)) / TICKGRAV  heightmax / (MAXVEL * TICK) + (1 + vel / MAXVEL) * tick0 + 0.5 * TICKGRAV / MAXVEL * tick0 * tick0
+// PART1 -(vel + Math.sqrt(vel * vel - 2.0 * GRAVITY * heightmax)) / TICKGRAV
+Multiply { srcVar1 $vel srcVar2 $vel resultVar $tmp1 }
+Multiply { srcVar1 $2 srcVar2 $GRAVITY resultVar $tmp2 }
+Multiply { srcVar1 $heightmax srcVar2 $tmp2 resultVar $tmp2 }
+Subtract { srcVar1 $tmp1 srcVar2 $tmp2 resultVar $tmp1 }
+
+// SQRT START
+
+// initial guess = tick0
+Equals { srcVar1 $tick0 resultVar $sqrt }
+// number we want to sqrt
+Equals { srcVar1 $tmp1 resultVar $num }
+// sqrt using 10 iterations of newtons method -> sqrt = 0.5(sqrt + number/sqrt)
+Divide { srcVar1 $num srcVar2 $sqrt resultVar $tmp1 }
+Add { srcVar1 $tmp1 srcVar2 $sqrt resultVar $tmp1 }
+Multiply { srcVar1 $h srcVar2 $tmp1 resultVar $sqrt }
+Divide { srcVar1 $num srcVar2 $sqrt resultVar $tmp1 }
+Add { srcVar1 $tmp1 srcVar2 $sqrt resultVar $tmp1 }
+Multiply { srcVar1 $h srcVar2 $tmp1 resultVar $sqrt }
+Divide { srcVar1 $num srcVar2 $sqrt resultVar $tmp1 }
+Add { srcVar1 $tmp1 srcVar2 $sqrt resultVar $tmp1 }
+Multiply { srcVar1 $h srcVar2 $tmp1 resultVar $sqrt }
+Divide { srcVar1 $num srcVar2 $sqrt resultVar $tmp1 }
+Add { srcVar1 $tmp1 srcVar2 $sqrt resultVar $tmp1 }
+Multiply { srcVar1 $h srcVar2 $tmp1 resultVar $sqrt }
+Divide { srcVar1 $num srcVar2 $sqrt resultVar $tmp1 }
+Add { srcVar1 $tmp1 srcVar2 $sqrt resultVar $tmp1 }
+Multiply { srcVar1 $h srcVar2 $tmp1 resultVar $sqrt }
+Divide { srcVar1 $num srcVar2 $sqrt resultVar $tmp1 }
+Add { srcVar1 $tmp1 srcVar2 $sqrt resultVar $tmp1 }
+Multiply { srcVar1 $h srcVar2 $tmp1 resultVar $sqrt }
+Divide { srcVar1 $num srcVar2 $sqrt resultVar $tmp1 }
+Add { srcVar1 $tmp1 srcVar2 $sqrt resultVar $tmp1 }
+Multiply { srcVar1 $h srcVar2 $tmp1 resultVar $sqrt }
+Divide { srcVar1 $num srcVar2 $sqrt resultVar $tmp1 }
+Add { srcVar1 $tmp1 srcVar2 $sqrt resultVar $tmp1 }
+Multiply { srcVar1 $h srcVar2 $tmp1 resultVar $sqrt }
+Divide { srcVar1 $num srcVar2 $sqrt resultVar $tmp1 }
+Add { srcVar1 $tmp1 srcVar2 $sqrt resultVar $tmp1 }
+Multiply { srcVar1 $h srcVar2 $tmp1 resultVar $sqrt }
+
+Equals { srcVar1 $sqrt resultVar $tmp1 }
+
+// SQRT END
+
+Add { srcVar1 $vel srcVar2 $tmp1 resultVar $tmp1 }
+Multiply { srcVar1 $n srcVar2 $tmp1 resultVar $tmp1 }
+Divide { srcVar1 $tmp1 srcVar2 $TICKGRAV resultVar $tickmax }
+// PART2 heightmax / (MAXVEL * TICK) + (1 + vel / MAXVEL) * tick0 + 0.5 * TICKGRAV / MAXVEL * tick0 * tick0
+// tmp1 + tmp2
+Multiply { srcVar1 $MAXVEL srcVar2 $TICK resultVar $tmp1 }
+Divide { srcVar1 $heightmax srcVar2 $tmp1 resultVar $tmp1 }
+Divide { srcVar1 $vel srcVar2 $MAXVEL resultVar $tmp2 }
+Add { srcVar1 $1 srcVar2 $tmp2 resultVar $tmp2 }
+Multiply { srcVar1 $tick0 srcVar2 $tmp2 resultVar $tmp2 }
+Add { srcVar1 $tmp2 srcVar2 $tmp1 resultVar $tmp1 }
+Multiply { srcVar1 $h srcVar2 $TICKGRAV resultVar $tmp2 }
+Divide { srcVar1 $tmp2 srcVar2 $MAXVEL resultVar $tmp2 }
+Multiply { srcVar1 $tick0 srcVar2 $tmp2 resultVar $tmp2 }
+Multiply { srcVar1 $tick0 srcVar2 $tmp2 resultVar $tmp2 }
+Add { srcVar1 $tmp1 srcVar2 $tmp2 resultVar $tmp1 }
+
+LessOrEqual { srcVar1 $z0 srcVar2 $0 lessEqualVar $tickmax greaterVar $tmp1 resultVar $tickmax }
+
+Int { srcVar1 $tickmax resultVar $tickmax } // Int
+
+// --- getLandTickFromStartZVel heightmin ---
+// z0 = 0.5 * TICKGRAV * tick0 * tick0 * TICK + vel * tick0 * TICK + heightmin
+Multiply { srcVar1 $h srcVar2 $TICKGRAV resultVar $tmp1 }
+Multiply { srcVar1 $tick0 srcVar2 $tmp1 resultVar $tmp1 }
+Multiply { srcVar1 $tick0 srcVar2 $tmp1 resultVar $tmp1 }
+Multiply { srcVar1 $TICK srcVar2 $tmp1 resultVar $tmp1 }
+Multiply { srcVar1 $vel srcVar2 $tick0 resultVar $tmp2 }
+Multiply { srcVar1 $TICK srcVar2 $tmp2 resultVar $tmp2 }
+Add { srcVar1 $tmp1 srcVar2 $tmp2 resultVar $tmp1 }
+Add { srcVar1 $tmp1 srcVar2 $heightmin resultVar $z0 }
+
+// tickmin = z0 <= 0.0 ? -(vel + Math.sqrt(vel * vel - 2.0 * GRAVITY * heightmin)) / TICKGRAV  heightmin / (MAXVEL * TICK) + (1 + vel / MAXVEL) * tick0 + 0.5 * TICKGRAV / MAXVEL * tick0 * tick0
+// PART1 -(vel + Math.sqrt(vel * vel - 2.0 * GRAVITY * heightmin)) / TICKGRAV
+Multiply { srcVar1 $vel srcVar2 $vel resultVar $tmp1 }
+Multiply { srcVar1 $2 srcVar2 $GRAVITY resultVar $tmp2 }
+Multiply { srcVar1 $heightmin srcVar2 $tmp2 resultVar $tmp2 }
+Subtract { srcVar1 $tmp1 srcVar2 $tmp2 resultVar $tmp1 }
+
+// SQRT START
+
+// initial guess = tick0
+Equals { srcVar1 $tick0 resultVar $sqrt }
+// number we want to sqrt
+Equals { srcVar1 $tmp1 resultVar $num }
+// sqrt using 10 iterations of newtons method -> sqrt = 0.5(sqrt + number/sqrt)
+Divide { srcVar1 $num srcVar2 $sqrt resultVar $tmp1 }
+Add { srcVar1 $tmp1 srcVar2 $sqrt resultVar $tmp1 }
+Multiply { srcVar1 $h srcVar2 $tmp1 resultVar $sqrt }
+Divide { srcVar1 $num srcVar2 $sqrt resultVar $tmp1 }
+Add { srcVar1 $tmp1 srcVar2 $sqrt resultVar $tmp1 }
+Multiply { srcVar1 $h srcVar2 $tmp1 resultVar $sqrt }
+Divide { srcVar1 $num srcVar2 $sqrt resultVar $tmp1 }
+Add { srcVar1 $tmp1 srcVar2 $sqrt resultVar $tmp1 }
+Multiply { srcVar1 $h srcVar2 $tmp1 resultVar $sqrt }
+Divide { srcVar1 $num srcVar2 $sqrt resultVar $tmp1 }
+Add { srcVar1 $tmp1 srcVar2 $sqrt resultVar $tmp1 }
+Multiply { srcVar1 $h srcVar2 $tmp1 resultVar $sqrt }
+Divide { srcVar1 $num srcVar2 $sqrt resultVar $tmp1 }
+Add { srcVar1 $tmp1 srcVar2 $sqrt resultVar $tmp1 }
+Multiply { srcVar1 $h srcVar2 $tmp1 resultVar $sqrt }
+Divide { srcVar1 $num srcVar2 $sqrt resultVar $tmp1 }
+Add { srcVar1 $tmp1 srcVar2 $sqrt resultVar $tmp1 }
+Multiply { srcVar1 $h srcVar2 $tmp1 resultVar $sqrt }
+Divide { srcVar1 $num srcVar2 $sqrt resultVar $tmp1 }
+Add { srcVar1 $tmp1 srcVar2 $sqrt resultVar $tmp1 }
+Multiply { srcVar1 $h srcVar2 $tmp1 resultVar $sqrt }
+Divide { srcVar1 $num srcVar2 $sqrt resultVar $tmp1 }
+Add { srcVar1 $tmp1 srcVar2 $sqrt resultVar $tmp1 }
+Multiply { srcVar1 $h srcVar2 $tmp1 resultVar $sqrt }
+Divide { srcVar1 $num srcVar2 $sqrt resultVar $tmp1 }
+Add { srcVar1 $tmp1 srcVar2 $sqrt resultVar $tmp1 }
+Multiply { srcVar1 $h srcVar2 $tmp1 resultVar $sqrt }
+
+Equals { srcVar1 $sqrt resultVar $tmp1 }
+
+// SQRT END
+
+Add { srcVar1 $vel srcVar2 $tmp1 resultVar $tmp1 }
+Multiply { srcVar1 $n srcVar2 $tmp1 resultVar $tmp1 }
+Divide { srcVar1 $tmp1 srcVar2 $TICKGRAV resultVar $tickmin }
+// PART2 heightmin / (MAXVEL * TICK) + (1 + vel / MAXVEL) * tick0 + 0.5 * TICKGRAV / MAXVEL * tick0 * tick0
+// tmp1 + tmp2
+Multiply { srcVar1 $MAXVEL srcVar2 $TICK resultVar $tmp1 }
+Divide { srcVar1 $heightmin srcVar2 $tmp1 resultVar $tmp1 }
+Divide { srcVar1 $vel srcVar2 $MAXVEL resultVar $tmp2 }
+Add { srcVar1 $1 srcVar2 $tmp2 resultVar $tmp2 }
+Multiply { srcVar1 $tick0 srcVar2 $tmp2 resultVar $tmp2 }
+Add { srcVar1 $tmp2 srcVar2 $tmp1 resultVar $tmp1 }
+Multiply { srcVar1 $h srcVar2 $TICKGRAV resultVar $tmp2 }
+Divide { srcVar1 $tmp2 srcVar2 $MAXVEL resultVar $tmp2 }
+Multiply { srcVar1 $tick0 srcVar2 $tmp2 resultVar $tmp2 }
+Multiply { srcVar1 $tick0 srcVar2 $tmp2 resultVar $tmp2 }
+Add { srcVar1 $tmp1 srcVar2 $tmp2 resultVar $tmp1 }
+
+LessOrEqual { srcVar1 $z0 srcVar2 $0 lessEqualVar $tickmin greaterVar $tmp1 resultVar $tickmin }
+
+// tickmin = Math.ceil(tickmin)
+Frac { srcVar1 $tickmin resultVar $tmp1 } // Frac
+Int { srcVar1 $tickmin resultVar $tmp2 } // Int
+Add { srcVar1 $tmp2 srcVar2 $1 resultVar $tmp3 }
+LessOrEqual { srcVar1 $tmp1 srcVar2 $0 lessEqualVar $tmp2 greaterVar $tmp3 resultVar $tickmin }
+
+// b = (height - intervalmax >= heightmax || height - intervalmin >= heightmin) && (tickmax - tickmin) >= 0.0
+// PART1 if (height - intervalmax >= heightmax) tmp1 = 1 else 0
+Subtract { srcVar1 $height srcVar2 $intervalmax resultVar $tmp1 }
+LessOrEqual { srcVar1 $heightmax srcVar2 $tmp1 lessEqualVar $1 greaterVar $0 resultVar $tmp1 }
+// PART2 if (height - intervalmin >= heightmin) tmp2 = 1 else 0
+Subtract { srcVar1 $height srcVar2 $intervalmin resultVar $tmp2 }
+LessOrEqual { srcVar1 $heightmin srcVar2 $tmp2 lessEqualVar $1 greaterVar $0 resultVar $tmp2 }
+
+Add { srcVar1 $tmp1 srcVar2 $tmp2 resultVar $tmp1 }
+LessOrEqual { srcVar1 $1 srcVar2 $tmp1 lessEqualVar $1 greaterVar $0 resultVar $tmp1 }
+
+// PART3 if (tickmax - tickmin >= 0.0) tmp3 = 1 else 0
+Subtract { srcVar1 $tickmax srcVar2 $tickmin resultVar $tmp3 }
+LessOrEqual { srcVar1 $0 srcVar2 $tmp3 lessEqualVar $1 greaterVar $0 resultVar $tmp3 }
+
+Add { srcVar1 $tmp3 srcVar2 $tmp1 resultVar $tmp1 }
+LessOrEqual { srcVar1 $2 srcVar2 $tmp1 lessEqualVar $1 greaterVar $0 resultVar $b }
+
